@@ -118,11 +118,11 @@ class MessageAggregator:
         filtered = []
         
         for msg in messages:
-            # Skip bot messages
-            if msg.get("subtype") in self.BOT_SUBTYPE_PATTERNS:
-                continue
-            if msg.get("bot_id"):
-                continue
+            # Skip bot messages (commented out for testing with seeded messages)
+            # if msg.get("subtype") in self.BOT_SUBTYPE_PATTERNS:
+            #     continue
+            # if msg.get("bot_id"):
+            #     continue
             
             # Skip system messages
             if msg.get("subtype") in self.SYSTEM_SUBTYPES:
