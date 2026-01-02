@@ -67,25 +67,115 @@ Guidelines:
         return {"dependencies": [], "cross_team_highlights": []}
     
     def _mock_result(self, messages_text: str, team_name: str) -> dict:
-        """Generate mock dependencies for testing."""
-        return {
-            "dependencies": [
-                {
-                    "type": "waiting_on",
-                    "from_team": "software",
-                    "to_team": "electrical",
-                    "what_changed": "New PCB firmware interface needed",
-                    "why_it_matters": "Software team blocked on API definition",
-                    "recommended_action": "Schedule 30-min sync to align on interface",
-                    "suggested_owner": "electrical lead",
-                    "urgency": "medium",
-                    "confidence": 0.85
-                }
-            ],
-            "cross_team_highlights": [
-                "Electrical and Software teams need to sync on firmware API"
-            ]
+        """
+        Generate dependencies using heuristic content analysis.
+        
+        Parses message content for cross-team patterns:
+        - "waiting on [team]"
+        - "blocked by [team]"
+        - "need from [team]"
+        - "@mentions of other team members"
+        - Team name references in other team's context
+        """
+        import re
+        
+        dependencies = []
+        highlights = set()
+        
+        # Team aliases for matching
+        team_patterns = {
+            "mechanical": ["mechanical", "mech", "hardware", "cnc", "fab"],
+            "electrical": ["electrical", "ee", "pcb", "power", "firmware"],
+            "software": ["software", "sw", "code", "api", "deploy"],
         }
+        
+        # Flatten to lookup
+        team_lookup = {}
+        for team, aliases in team_patterns.items():
+            for alias in aliases:
+                team_lookup[alias] = team
+        
+        # Cross-team detection patterns
+        patterns = [
+            # "waiting on X" / "waiting for X"
+            (r"waiting (?:on|for) (\w+)", "waiting_on"),
+            # "blocked by X" / "blocked on X"
+            (r"blocked (?:by|on) (\w+)", "blocking"),
+            # "need from X" / "needs from X"
+            (r"needs? from (\w+)", "waiting_on"),
+            # "depends on X"
+            (r"depends? on (\w+)", "waiting_on"),
+            # "coordinating with X"
+            (r"coordinat(?:e|ing) with (\w+)", "informational"),
+            # "sync with X"
+            (r"sync(?:ing)? with (\w+)", "informational"),
+            # "API" / "interface" mentions
+            (r"(?:api|interface) (?:change|update)", "interface_change"),
+            # "by Friday" / "by EOD" deadline patterns
+            (r"(?:need|require|want).*by (?:friday|monday|eod|end of day|tomorrow)", "timeline_impact"),
+        ]
+        
+        # Process patterns
+        messages_lower = messages_text.lower()
+        
+        for pattern, dep_type in patterns:
+            matches = re.findall(pattern, messages_lower, re.IGNORECASE)
+            for match in matches:
+                if isinstance(match, str):
+                    # Check if the matched word is a team reference
+                    matched_team = team_lookup.get(match.lower())
+                    if matched_team:
+                        # Only create dependency if it's a different team
+                        source_team = self._detect_source_team(messages_text, team_patterns)
+                        if source_team and source_team != matched_team:
+                            dep = {
+                                "type": dep_type,
+                                "from_team": source_team,
+                                "to_team": matched_team,
+                                "what_changed": f"Cross-team dependency detected: {dep_type.replace('_', ' ')}",
+                                "why_it_matters": f"{source_team.title()} team has dependency on {matched_team.title()} team",
+                                "recommended_action": f"Schedule sync between {source_team} and {matched_team} teams",
+                                "suggested_owner": f"{matched_team} lead",
+                                "urgency": "high" if dep_type == "blocking" else "medium",
+                                "confidence": 0.75,
+                            }
+                            # Avoid duplicates
+                            if not any(d["from_team"] == dep["from_team"] and d["to_team"] == dep["to_team"] for d in dependencies):
+                                dependencies.append(dep)
+                                highlights.add(f"{source_team.title()} ↔ {matched_team.title()}: {dep_type.replace('_', ' ')}")
+        
+        # Check for @mentions (Slack user mentions)
+        user_mentions = re.findall(r"<@([A-Z0-9_]+)>", messages_text)
+        if user_mentions:
+            source_team = self._detect_source_team(messages_text, team_patterns)
+            if source_team:
+                highlights.add(f"{source_team.title()} team has {len(user_mentions)} cross-reference mentions")
+        
+        # If no dependencies found, return empty (not fake hardcoded ones)
+        if not dependencies:
+            return {"dependencies": [], "cross_team_highlights": []}
+        
+        return {
+            "dependencies": dependencies,
+            "cross_team_highlights": list(highlights)[:5],
+        }
+    
+    def _detect_source_team(self, text: str, team_patterns: dict) -> str | None:
+        """Detect which team this message is about based on content."""
+        text_lower = text.lower()
+        
+        # Count mentions of each team
+        team_counts = {}
+        for team, aliases in team_patterns.items():
+            count = sum(text_lower.count(alias) for alias in aliases)
+            if count > 0:
+                team_counts[team] = count
+        
+        if not team_counts:
+            return None
+        
+        # Return the most mentioned team
+        return max(team_counts, key=team_counts.get)
     
     def detect_dependencies(
         self,

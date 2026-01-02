@@ -110,19 +110,23 @@ class MessageAggregator:
         Filter out noise from messages.
         
         Removes:
-        - Bot messages
+        - Bot messages (if FILTER_BOTS is enabled)
         - System messages (joins, leaves, topic changes)
         - Messages with only reactions/attachments (no text)
         - Empty messages
         """
+        import os
+        filter_bots = os.getenv("FILTER_BOTS", "true").lower() == "true"
+        
         filtered = []
         
         for msg in messages:
-            # Skip bot messages (commented out for testing with seeded messages)
-            # if msg.get("subtype") in self.BOT_SUBTYPE_PATTERNS:
-            #     continue
-            # if msg.get("bot_id"):
-            #     continue
+            # Skip bot messages (controlled by FILTER_BOTS env var)
+            if filter_bots:
+                if msg.get("subtype") in self.BOT_SUBTYPE_PATTERNS:
+                    continue
+                if msg.get("bot_id"):
+                    continue
             
             # Skip system messages
             if msg.get("subtype") in self.SYSTEM_SUBTYPES:

@@ -28,6 +28,7 @@ class GlobalDigest:
     cross_team_highlights: list[str] = field(default_factory=list)
     org_wide_risks: list[StructuredEvent] = field(default_factory=list)
     notable_decisions: list[Decision] = field(default_factory=list)
+    cross_team_alerts: list[CrossTeamAlert] = field(default_factory=list)
     total_events: int = 0
 
 
@@ -126,8 +127,12 @@ class DigestOrchestrator:
         self.metrics.start()
         
         try:
-            # Step 0: Aggregate messages
-            logger.info("Step 0: Aggregating messages...")
+            # Step 0a: Auto-process prior feedback (B1)
+            logger.info("Step 0a: Processing prior feedback...")
+            item_confidences = self._process_prior_feedback()
+            
+            # Step 0b: Aggregate messages
+            logger.info("Step 0b: Aggregating messages...")
             aggregator = MessageAggregator(slack_client, self.config)
             channel_messages = await aggregator.fetch_all_channels(since)
             
@@ -148,6 +153,10 @@ class DigestOrchestrator:
             dependencies, highlights = await self._step2_detect_dependencies(events_by_team)
             logger.info(f"Found {len(dependencies)} dependencies")
             
+            # Step 2b: Create CrossTeamAlerts from dependencies (C1)
+            cross_team_alerts = self.dependency_linker.create_alerts(dependencies)
+            logger.info(f"Created {len(cross_team_alerts)} cross-team alerts")
+            
             # Step 3: Extract action items
             logger.info("Step 3: Extracting action items...")
             actions = self._step3_extract_actions(all_events, team_analyses)
@@ -157,8 +166,10 @@ class DigestOrchestrator:
             logger.info("Step 4: Writing to memory...")
             memory_writes = self._step4_memory_writes(all_events, dependencies)
             
-            # Create global digest
-            global_digest = self._create_global_digest(all_events, dependencies, highlights)
+            # Create global digest with alerts
+            global_digest = self._create_global_digest(
+                all_events, dependencies, highlights, cross_team_alerts
+            )
             
             self.metrics.finish()
             self.metrics.log_summary()
@@ -175,6 +186,55 @@ class DigestOrchestrator:
             self.metrics.record_failure(str(e))
             self.metrics.finish()
             raise
+    
+    def _process_prior_feedback(self) -> dict[str, float]:
+        """
+        Process prior feedback to improve this run (B1).
+        
+        Returns:
+            Dict of item_id -> confidence adjustment
+        """
+        import os
+        if os.getenv("SKIP_FEEDBACK_PROCESSING", "").lower() == "true":
+            return {}
+        
+        try:
+            from .feedback import FeedbackStore, FeedbackProcessor, PromptEnhancer
+            
+            store = FeedbackStore()
+            processor = FeedbackProcessor(store)
+            enhancer = PromptEnhancer(store)
+            
+            # Get recent items with feedback
+            recent_items = store.get_recent_items(days=7)
+            
+            # Apply item-specific feedback adjustments
+            for item in recent_items:
+                feedback = store.get_feedback_for_item(item.digest_item_id)
+                if feedback:
+                    processor.apply_item_specific_feedback(item.digest_item_id)
+            
+            # Generate new directives for each team
+            for team in ["mechanical", "electrical", "software"]:
+                enhancer.generate_directives(team)
+            
+            # Return confidence adjustments for similar items
+            confidence_map = {}
+            for item in recent_items:
+                adj = store.get_item_adjustment(item.digest_item_id)
+                if adj and adj != 0:
+                    # Use item type + team as key for similar future items
+                    key = f"{item.item_type}_{item.team}"
+                    confidence_map[key] = adj
+            
+            if confidence_map:
+                logger.info(f"Loaded {len(confidence_map)} confidence adjustments from feedback")
+            
+            return confidence_map
+            
+        except Exception as e:
+            logger.debug(f"Feedback processing skipped: {e}")
+            return {}
     
     async def _step1_analyze_teams(
         self,
@@ -289,8 +349,9 @@ class DigestOrchestrator:
         events: list[StructuredEvent],
         dependencies: list[Dependency],
         highlights: list[str],
+        cross_team_alerts: list[CrossTeamAlert] = None,
     ) -> GlobalDigest:
-        """Create the global org-wide digest."""
+        """Create the global org-wide digest with cross-team alerts."""
         # Get org-wide risks (high urgency blockers)
         risks = [e for e in events if isinstance(e, Blocker) and e.urgency == "high"]
         
@@ -305,5 +366,6 @@ class DigestOrchestrator:
             cross_team_highlights=list(set(all_highlights))[:5],
             org_wide_risks=risks[:5],
             notable_decisions=decisions[:5],
+            cross_team_alerts=cross_team_alerts or [],
             total_events=len(events),
         )

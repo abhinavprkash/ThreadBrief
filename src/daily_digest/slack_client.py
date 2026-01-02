@@ -146,6 +146,15 @@ class MockSlackClient:
         """Get channel name from fixtures."""
         channel = self._data.get("channels", {}).get(channel_id, {})
         return channel.get("name", channel_id)
+    
+    def get_reactions(
+        self,
+        channel: str,
+        timestamp: str,
+    ) -> list[dict]:
+        """Get reactions for a message (mock returns empty for fixtures)."""
+        # In mock mode, we don't have real reactions - return empty
+        return []
 
 
 class RealSlackClient:
@@ -237,6 +246,27 @@ class RealSlackClient:
             return name
         except SlackApiError:
             return user_id
+    
+    def get_reactions(
+        self,
+        channel: str,
+        timestamp: str,
+    ) -> list[dict]:
+        """
+        Get reactions for a specific message.
+        
+        Returns list of reactions, each with 'name' and 'users' keys.
+        """
+        try:
+            response = self.client.reactions_get(
+                channel=channel,
+                timestamp=timestamp,
+            )
+            message = response.get("message", {})
+            return message.get("reactions", [])
+        except SlackApiError as e:
+            print(f"Error getting reactions: {e.response['error']}")
+            return []
 
 
 class SlackClient:
@@ -316,3 +346,11 @@ class SlackClient:
         if hasattr(self._client, "sent_dms"):
             return self._client.sent_dms
         return []
+    
+    def get_reactions(
+        self,
+        channel: str,
+        timestamp: str,
+    ) -> list[dict]:
+        """Get reactions for a specific message."""
+        return self._client.get_reactions(channel, timestamp)

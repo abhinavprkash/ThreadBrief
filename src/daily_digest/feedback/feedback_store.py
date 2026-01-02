@@ -158,6 +158,19 @@ class FeedbackStore:
                 )
             """)
             
+            # User personas table - stores role and team preferences
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS user_personas (
+                    user_id TEXT PRIMARY KEY,
+                    role TEXT DEFAULT 'ic',
+                    team TEXT DEFAULT 'general',
+                    custom_topics TEXT DEFAULT '[]',
+                    custom_boosts TEXT DEFAULT '{}',
+                    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            
             # Create indexes for common queries
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_items_team ON digest_items(team)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_items_ts ON digest_items(slack_message_ts)")
@@ -423,6 +436,72 @@ class FeedbackStore:
                 UPDATE prompt_patches SET active = 0 WHERE team = ? AND directive = ?
             """, (team, directive))
     
+    # ==================== User Personas ====================
+    
+    def set_user_persona(
+        self,
+        user_id: str,
+        role: str = "ic",
+        team: str = "general",
+        custom_topics: list[str] = None,
+        custom_boosts: dict[str, float] = None,
+    ):
+        """Set or update a user's persona preferences."""
+        now = datetime.now().isoformat()
+        with self._get_conn() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO user_personas (user_id, role, team, custom_topics, custom_boosts, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?)
+                ON CONFLICT(user_id) DO UPDATE SET
+                    role = excluded.role,
+                    team = excluded.team,
+                    custom_topics = excluded.custom_topics,
+                    custom_boosts = excluded.custom_boosts,
+                    updated_at = excluded.updated_at
+            """, (
+                user_id,
+                role,
+                team,
+                json.dumps(custom_topics or []),
+                json.dumps(custom_boosts or {}),
+                now,
+            ))
+    
+    def get_user_persona(self, user_id: str) -> Optional[dict]:
+        """Get a user's persona preferences."""
+        with self._get_conn() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT * FROM user_personas WHERE user_id = ?
+            """, (user_id,))
+            row = cursor.fetchone()
+            if row:
+                return {
+                    "user_id": row["user_id"],
+                    "role": row["role"],
+                    "team": row["team"],
+                    "custom_topics": json.loads(row["custom_topics"] or "[]"),
+                    "custom_boosts": json.loads(row["custom_boosts"] or "{}"),
+                }
+        return None
+    
+    def get_all_user_personas(self) -> list[dict]:
+        """Get all stored user personas."""
+        with self._get_conn() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM user_personas")
+            return [
+                {
+                    "user_id": row["user_id"],
+                    "role": row["role"],
+                    "team": row["team"],
+                    "custom_topics": json.loads(row["custom_topics"] or "[]"),
+                    "custom_boosts": json.loads(row["custom_boosts"] or "{}"),
+                }
+                for row in cursor.fetchall()
+            ]
+    
     # ==================== Utility ====================
     
     def generate_item_id(self, run_id: str, team: str, item_type: str, index: int) -> str:
@@ -432,3 +511,4 @@ class FeedbackStore:
     def emoji_to_feedback_type(self, emoji: str) -> Optional[str]:
         """Map Slack emoji name to feedback type."""
         return self.EMOJI_MAP.get(emoji.lower().strip(":"))
+
