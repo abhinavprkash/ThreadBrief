@@ -4,7 +4,7 @@ import os
 import pytest
 
 # Set dummy API key and enable mock mode for testing
-os.environ["OPENAI_API_KEY"] = "sk-test-dummy-key-for-testing"
+os.environ["GOOGLE_API_KEY"] = "test-dummy-key-for-testing"
 os.environ["MOCK_LLM"] = "true"
 
 from daily_digest.agents import TeamAnalyzerAgent, TeamAnalysis

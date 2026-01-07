@@ -6,7 +6,7 @@ from dataclasses import dataclass, field, asdict
 from typing import Optional
 from datetime import datetime
 
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.schema import HumanMessage, SystemMessage
 
 from ..personalization.personas import Persona
@@ -112,11 +112,11 @@ class DigestEvaluator:
         self._llm = None
     
     @property
-    def llm(self) -> ChatOpenAI:
+    def llm(self) -> ChatGoogleGenerativeAI:
         """Lazy-load LLM."""
         if self._llm is None:
-            model = os.getenv("CHAT_MODEL", "gpt-4")
-            self._llm = ChatOpenAI(model=model, temperature=0.3)
+            model = os.getenv("CHAT_MODEL", "gemini-3-pro-preview")
+            self._llm = ChatGoogleGenerativeAI(model=model, temperature=0.3)
         return self._llm
     
     def evaluate_items(

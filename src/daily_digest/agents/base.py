@@ -39,8 +39,8 @@ class BaseAgent(ABC):
         # Only initialize LLM if not in mock mode
         if not self.mock_mode:
             try:
-                from langchain_openai import ChatOpenAI
-                self.llm = ChatOpenAI(
+                from langchain_google_genai import ChatGoogleGenerativeAI
+                self.llm = ChatGoogleGenerativeAI(
                     model=self.model_name,
                     temperature=self.temperature,
                 )

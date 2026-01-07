@@ -12,7 +12,7 @@ Usage:
     poetry run python scripts/generate_synthetic_data.py [--days N] [--output PATH]
 
 Requirements:
-    - OPENAI_API_KEY and CHAT_MODEL in .env
+    - GOOGLE_API_KEY and CHAT_MODEL in .env
 """
 
 import json
@@ -23,7 +23,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.schema import HumanMessage
 
 load_dotenv()
@@ -176,7 +176,7 @@ def get_llm():
     model = os.getenv("CHAT_MODEL", "gpt-4")
     temperature = float(os.getenv("TEMPERATURE", "0.7"))
     
-    return ChatOpenAI(
+    return ChatGoogleGenerativeAI(
         model=model,
         temperature=temperature,
     )
