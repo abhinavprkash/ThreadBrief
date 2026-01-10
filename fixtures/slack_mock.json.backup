@@ -1,0 +1,408 @@
+{
+  "channels": {
+    "C_MECHANICAL": {
+      "name": "mechanical-team",
+      "messages": [
+        {
+          "ts": "1703462400.000001",
+          "user": "U_ALEX",
+          "text": "Good morning team! Just finished the motor mount assembly for the new prototype. All tolerances are within spec. Ready for testing tomorrow."
+        },
+        {
+          "ts": "1703463000.000002",
+          "user": "U_MARIA",
+          "text": "Great work <@U_ALEX>! I reviewed the CAD files for the chassis redesign. Found a potential interference issue with the cooling duct placement. Can we sync up at 2pm?"
+        },
+        {
+          "ts": "1703463600.000003",
+          "user": "U_ALEX",
+          "text": "Sure thing. I noticed that too when running the FEA simulation. The thermal stress near the mounting bracket is higher than expected."
+        },
+        {
+          "ts": "1703464200.000004",
+          "user": "U_JAMES",
+          "text": "Heads up - we're running low on M8 titanium bolts. Current stock: 23 units, but the prototype needs 40. Lead time for reorder is 10 days."
+        },
+        {
+          "ts": "1703464800.000005",
+          "user": "U_MARIA",
+          "text": "That's a blocker. <@U_ALEX> can we substitute with stainless steel for the non-critical mounting points? Would save about 15 titanium bolts."
+        },
+        {
+          "ts": "1703465400.000006",
+          "user": "U_ALEX",
+          "text": "Let me check the stress requirements... Yes, points 3, 7, and 8 can use SS316. That brings us down to 25 titanium bolts needed."
+        },
+        {
+          "ts": "1703466000.000007",
+          "user": "U_SARAH",
+          "text": "Just got back from the supplier meeting. They can expedite the titanium order if we pay 15% rush fee. Delivery in 5 days instead of 10."
+        },
+        {
+          "ts": "1703466600.000008",
+          "user": "U_MARIA",
+          "text": "Decision: Let's go with the SS316 substitution for non-critical points. That way we have enough titanium stock. <@U_SARAH> please update the BOM with the new part numbers."
+        },
+        {
+          "ts": "1703467200.000009",
+          "user": "U_JAMES",
+          "text": "CNC machine is down again. Maintenance says it'll be back up by Wednesday EOD. This might delay the gear housing fabrication."
+        },
+        {
+          "ts": "1703467800.000010",
+          "user": "U_ALEX",
+          "text": "If it's not back by Wednesday, we should consider external fabrication. I have a quote from MetalWorks Inc - they can do it in 3 days at $2,400."
+        },
+        {
+          "ts": "1703468400.000011",
+          "user": "U_MARIA",
+          "text": "Good backup plan. Let's wait until Wednesday noon and then decide. <@U_JAMES> can you follow up with maintenance for status updates?"
+        },
+        {
+          "ts": "1703469000.000012",
+          "user": "U_JAMES",
+          "text": "Will do. I'll send hourly updates if there's any change."
+        },
+        {
+          "ts": "1703469600.000013",
+          "user": "U_SARAH",
+          "text": "Question: The electrical team mentioned they need the motor mount dimensions by Friday for PCB layout. Can we confirm the final specs?"
+        },
+        {
+          "ts": "1703470200.000014",
+          "user": "U_ALEX",
+          "text": "The dimensions are locked: 120mm x 85mm x 45mm with M6 mounting holes at 100mm spacing. I'll send the 3D model to <@U_KEVIN> in electrical."
+        },
+        {
+          "ts": "1703470800.000015",
+          "user": "U_MARIA",
+          "text": "End of day summary: Motor mount complete, chassis redesign in progress with cooling duct fix planned. Titanium substitution approved. CNC status pending."
+        },
+        {
+          "ts": "1703471400.000016",
+          "user": "U_JAMES",
+          "text": "Update: Spoke with maintenance. The CNC issue is a spindle bearing. They've ordered the part - should arrive tomorrow morning."
+        },
+        {
+          "ts": "1703472000.000017",
+          "user": "U_SARAH",
+          "text": "FYI: Fire suppression system test scheduled for Thursday 2-4pm. We'll need to evacuate the shop floor."
+        },
+        {
+          "ts": "1703472600.000018",
+          "user": "U_ALEX",
+          "text": "Good to know. I'll make sure all critical work is done before 2pm Thursday."
+        },
+        {
+          "ts": "1703473200.000019",
+          "user": "U_MARIA",
+          "text": "Risk flag: If CNC isn't back by Thursday morning, combined with the fire suppression test, we lose almost a full day. We should definitely have MetalWorks on standby."
+        },
+        {
+          "ts": "1703473800.000020",
+          "user": "U_JAMES",
+          "text": "Agreed. I'll call MetalWorks and get them on standby. They said they just need 24 hours notice to start."
+        }
+      ]
+    },
+    "C_ELECTRICAL": {
+      "name": "electrical-team",
+      "messages": [
+        {
+          "ts": "1703462400.000001",
+          "user": "U_KEVIN",
+          "text": "PCB Rev 2.3 came back from the fab house yesterday. Initial visual inspection looks good. Starting component placement today."
+        },
+        {
+          "ts": "1703463000.000002",
+          "user": "U_LISA",
+          "text": "I'll start the power supply testing once you have the DC-DC converter section populated. The gate driver IC is showing some weird behavior under high current."
+        },
+        {
+          "ts": "1703463600.000003",
+          "user": "U_KEVIN",
+          "text": "What kind of weird behavior? Is it the DRV8323?"
+        },
+        {
+          "ts": "1703464200.000004",
+          "user": "U_LISA",
+          "text": "Yes, the DRV8323. It's thermal shutting down at 12A instead of the rated 15A. I suspect it's a heatsinking issue on the Rev 2.2 board."
+        },
+        {
+          "ts": "1703464800.000005",
+          "user": "U_KEVIN",
+          "text": "That's concerning. Did we increase the copper pour on Rev 2.3? I remember we discussed adding thermal vias."
+        },
+        {
+          "ts": "1703465400.000006",
+          "user": "U_LISA",
+          "text": "We did add the thermal vias but only 9 instead of the recommended 16. It was a space constraint issue."
+        },
+        {
+          "ts": "1703466000.000007",
+          "user": "U_TOM",
+          "text": "I ran thermal simulations on the new layout. With 9 vias we should get to 13.5A before shutdown. Better but still not meeting spec."
+        },
+        {
+          "ts": "1703466600.000008",
+          "user": "U_KEVIN",
+          "text": "Option A: Add a small heatsink to the IC package. Option B: Reroute to fit more vias in Rev 2.4. Thoughts?"
+        },
+        {
+          "ts": "1703467200.000009",
+          "user": "U_LISA",
+          "text": "I vote heatsink for now. Rev 2.4 should have the proper via count, but we need a working prototype for the demo next week."
+        },
+        {
+          "ts": "1703467800.000010",
+          "user": "U_TOM",
+          "text": "Agreed. I have some 10x10mm heatsinks in the lab. I'll test fit one on the Rev 2.2 board today."
+        },
+        {
+          "ts": "1703468400.000011",
+          "user": "U_KEVIN",
+          "text": "Decision: Heatsink workaround for demo. <@U_TOM> please document the BOM addition. We need to add heatsink to production units too."
+        },
+        {
+          "ts": "1703469000.000012",
+          "user": "U_LISA",
+          "text": "I'm blocked on the firmware update. <@U_RYAN> in software was supposed to send the new motor control algorithm yesterday but I haven't received it yet."
+        },
+        {
+          "ts": "1703469600.000013",
+          "user": "U_KEVIN",
+          "text": "I'll ping Ryan. The mechanical team also needs our motor mount dimensions by Friday. <@U_ALEX> from mechanical just sent the 3D model - we can finalize the connector placement now."
+        },
+        {
+          "ts": "1703470200.000014",
+          "user": "U_TOM",
+          "text": "Great! The mount dimensions look good. 100mm spacing between M6 holes gives us plenty of room for the power connector."
+        },
+        {
+          "ts": "1703470800.000015",
+          "user": "U_LISA",
+          "text": "Update: Got the motor control algorithm from Ryan. Running integration tests now. Initial results look promising - 15% better efficiency!"
+        },
+        {
+          "ts": "1703471400.000016",
+          "user": "U_KEVIN",
+          "text": "Excellent! That's a great cross-team win. Make sure to document the test setup so software can replicate."
+        },
+        {
+          "ts": "1703472000.000017",
+          "user": "U_TOM",
+          "text": "Heatsink test complete. With the 10x10mm heatsink, the DRV8323 handles 16A sustained without thermal shutdown. We're good!"
+        },
+        {
+          "ts": "1703472600.000018",
+          "user": "U_LISA",
+          "text": "That's great news! I'll run the full stress test overnight. If it passes, we're green for the demo board."
+        },
+        {
+          "ts": "1703473200.000019",
+          "user": "U_KEVIN",
+          "text": "Question for team: Should we start Rev 2.4 layout now or wait for demo feedback? The 16-via solution needs about 3 days of layout work."
+        },
+        {
+          "ts": "1703473800.000020",
+          "user": "U_TOM",
+          "text": "I'd say start now. Even if demo goes perfectly, we want Rev 2.4 for production and lead time on PCBs is 2 weeks."
+        },
+        {
+          "ts": "1703474400.000021",
+          "user": "U_LISA",
+          "text": "Agreed. Better to have it ready and not need it than to be delayed later."
+        },
+        {
+          "ts": "1703475000.000022",
+          "user": "U_KEVIN",
+          "text": "Decision: <@U_TOM> start Rev 2.4 layout tomorrow. Priority is the thermal via count fix. Lisa and I will focus on demo prep."
+        }
+      ]
+    },
+    "C_SOFTWARE": {
+      "name": "software-team",
+      "messages": [
+        {
+          "ts": "1703462400.000001",
+          "user": "U_RYAN",
+          "text": "Deployed new API v2.1 to staging this morning. All integration tests passing. Ready for QA review."
+        },
+        {
+          "ts": "1703463000.000002",
+          "user": "U_AMANDA",
+          "text": "I saw some memory usage spikes in monitoring. The new caching layer might have a leak. Looking into it now."
+        },
+        {
+          "ts": "1703463600.000003",
+          "user": "U_RYAN",
+          "text": "Good catch. What's the memory growth rate? Is it urgent enough to block the release?"
+        },
+        {
+          "ts": "1703464200.000004",
+          "user": "U_AMANDA",
+          "text": "Growing at about 50MB/hour under load. At that rate, we'd hit OOM after about 8 hours. Definitely needs fixing before prod."
+        },
+        {
+          "ts": "1703464800.000005",
+          "user": "U_CHEN",
+          "text": "I reviewed the caching code. Found the issue - cache entries aren't being evicted properly when the TTL expires. PR incoming."
+        },
+        {
+          "ts": "1703465400.000006",
+          "user": "U_RYAN",
+          "text": "Nice find <@U_CHEN>! How long for the fix?"
+        },
+        {
+          "ts": "1703466000.000007",
+          "user": "U_CHEN",
+          "text": "PR is up: #1847. Added proper background eviction and fixed the timestamp comparison. Tests passing locally."
+        },
+        {
+          "ts": "1703466600.000008",
+          "user": "U_AMANDA",
+          "text": "Reviewing now. The fix looks good. I added one suggestion about concurrent access but it's not a blocker."
+        },
+        {
+          "ts": "1703467200.000009",
+          "user": "U_RYAN",
+          "text": "Approved and merged. Deploying to staging now. Amanda, can you monitor for the next hour?"
+        },
+        {
+          "ts": "1703467800.000010",
+          "user": "U_CHEN",
+          "text": "BTW Lisa from electrical is waiting on the motor control algorithm. I sent it yesterday but she says she didn't receive it. Resending now."
+        },
+        {
+          "ts": "1703468400.000011",
+          "user": "U_AMANDA",
+          "text": "Memory looks stable after 45 minutes under load. No growth. I think we're good!"
+        },
+        {
+          "ts": "1703469000.000012",
+          "user": "U_RYAN",
+          "text": "Excellent! Decision: We're go for production deployment tomorrow at 6am. Less traffic, easier rollback if needed."
+        },
+        {
+          "ts": "1703469600.000013",
+          "user": "U_DAVID",
+          "text": "Question: Are we also deploying the new metrics dashboard? Or is that a separate release?"
+        },
+        {
+          "ts": "1703470200.000014",
+          "user": "U_RYAN",
+          "text": "Metrics dashboard is separate - targeting next week. Let's not bundle too much in one release."
+        },
+        {
+          "ts": "1703470800.000015",
+          "user": "U_AMANDA",
+          "text": "Heads up: Found a potential race condition in the WebSocket handler during code review for #1850. Not urgent but we should fix it."
+        },
+        {
+          "ts": "1703471400.000016",
+          "user": "U_CHEN",
+          "text": "I can pick that up after the deployment. Do we have a reproduction case?"
+        },
+        {
+          "ts": "1703472000.000017",
+          "user": "U_AMANDA",
+          "text": "Not a reliable one yet. It's a timing thing. I'll set up a stress test to try to trigger it."
+        },
+        {
+          "ts": "1703472600.000018",
+          "user": "U_DAVID",
+          "text": "FYI: The mobile app team is complaining about API response times. They're seeing P99 latencies of 3s for the search endpoint."
+        },
+        {
+          "ts": "1703473200.000019",
+          "user": "U_RYAN",
+          "text": "That's way higher than expected. I'll look at the query plans tomorrow. Might be an index issue."
+        },
+        {
+          "ts": "1703473800.000020",
+          "user": "U_CHEN",
+          "text": "Risk: If the search latency is index related, fixing it might require downtime for rebuilding. We should schedule that carefully."
+        },
+        {
+          "ts": "1703474400.000021",
+          "user": "U_AMANDA",
+          "text": "Good point. Let's investigate first, then schedule any maintenance for the weekend if needed."
+        },
+        {
+          "ts": "1703475000.000022",
+          "user": "U_RYAN",
+          "text": "Agreed. Priority order for tomorrow: 1) Prod deployment 2) Search latency investigation 3) WebSocket race condition. Everyone aligned?"
+        },
+        {
+          "ts": "1703475600.000023",
+          "user": "U_DAVID",
+          "text": "LGTM. I'll start on the latency investigation early so we have data for the standup."
+        },
+        {
+          "ts": "1703476200.000024",
+          "user": "U_CHEN",
+          "text": "Sounds good. I'll prep the rollback plan for the deployment just in case."
+        },
+        {
+          "ts": "1703476800.000025",
+          "user": "U_AMANDA",
+          "text": "Update: Lisa from electrical confirmed the motor control algorithm is working great. 15% efficiency improvement! That's a nice cross-team win."
+        }
+      ]
+    },
+    "C_DIGEST": {
+      "name": "daily-digest",
+      "messages": []
+    }
+  },
+  "users": {
+    "U_ALEX": {
+      "name": "Alex Thompson",
+      "team": "mechanical"
+    },
+    "U_MARIA": {
+      "name": "Maria Rodriguez",
+      "team": "mechanical"
+    },
+    "U_JAMES": {
+      "name": "James Wilson",
+      "team": "mechanical"
+    },
+    "U_SARAH": {
+      "name": "Sarah Chen",
+      "team": "mechanical"
+    },
+    "U_KEVIN": {
+      "name": "Kevin Park",
+      "team": "electrical"
+    },
+    "U_LISA": {
+      "name": "Lisa Zhang",
+      "team": "electrical"
+    },
+    "U_TOM": {
+      "name": "Tom Baker",
+      "team": "electrical"
+    },
+    "U_RYAN": {
+      "name": "Ryan O'Brien",
+      "team": "software"
+    },
+    "U_AMANDA": {
+      "name": "Amanda Foster",
+      "team": "software"
+    },
+    "U_CHEN": {
+      "name": "Chen Wei",
+      "team": "software"
+    },
+    "U_DAVID": {
+      "name": "David Kim",
+      "team": "software"
+    },
+    "U_LEAD_1": {
+      "name": "Jennifer Smith",
+      "team": "leadership"
+    }
+  }
+}
