@@ -182,8 +182,45 @@ def cli():
         action="store_true",
         help="Enable debug logging"
     )
+    parser.add_argument(
+        "--generate-data",
+        action="store_true",
+        help="Generate synthetic Slack conversation data"
+    )
+    parser.add_argument(
+        "--days",
+        type=int,
+        default=5,
+        help="Number of days to generate (default: 5)"
+    )
+    parser.add_argument(
+        "--channels",
+        type=int,
+        default=5,
+        help="Number of channels to generate (default: 5)"
+    )
     
     args = parser.parse_args()
+    
+    # Handle data generation mode
+    if args.generate_data:
+        from pathlib import Path
+        import sys
+        # Add scripts directory to path
+        scripts_dir = Path(__file__).parent.parent.parent / "scripts"
+        sys.path.insert(0, str(scripts_dir))
+        
+        from generate_synthetic_data import main as generate_main, parse_args as generate_parse_args
+        import sys
+        
+        # Create args for the generator
+        gen_args = generate_parse_args([
+            "--days", str(args.days),
+            "--channels", str(args.channels),
+            "--output", "data/synthetic_conversations.json"
+        ])
+        generate_main(gen_args)
+        return
     
     if args.debug:
         import logging
