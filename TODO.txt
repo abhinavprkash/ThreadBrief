@@ -71,7 +71,7 @@ MEDIUM PRIORITY:
 
 TECHNICAL NOTES:
 ---------------
-- Free Gemini API Key: AIzaSyBzHwYHoOFIfP97u9-OY_5CuaYd24_Fio4 (in .env)
+- Free Gemini API Key: [REVOKED - was leaked, rotate if in use]
 - Model that works: gemini-2.5-flash (v1 endpoint, not v1beta)
 - Project directory: /home/mritvik/Documents/Code/Hackathon/ThreadPilot
 - Always run poetry commands from project directory (where pyproject.toml exists)
